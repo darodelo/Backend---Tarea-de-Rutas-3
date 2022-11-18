@@ -1,14 +1,20 @@
 
 // RUTAS CREAR PRODUCTO (TAREA 3)
 
+const { validationResult } = require("express-validator")
 const { Product } = require("../models/farmacia")
 
 
 const crearProducto = async (req, res) => {
     try {
-        const item = new Product(req.body)
-        await item.save()
-        res.status(201).json({item})
+        const err = validationResult(req)
+        if (err.isEmpty()) {
+            const item = new Product(req.body)
+            await item.save()
+            res.status(201).json({item})
+        } else {
+            res.status(501).json({err})
+        }
     } catch (error) {
         res.status(501).json({error})
     }
@@ -17,6 +23,11 @@ const crearProducto = async (req, res) => {
 const verProducto = async (req, res) => {
     const items = await Product.find()
     res.status(200).json({items})
+}
+
+const vistaUnicaProducto = async (req, res) => {
+    const item = await Product.findById(req.params.id)
+    res.status(200).json({item})
 }
 
 // RUTAS DE USUARIO
@@ -97,4 +108,4 @@ const metodoPost = (req, res) => {
     })
 }
 
-module.exports = { crearProducto, verProducto, users, division, suma, esPar, lista, metodoPost }
+module.exports = { crearProducto, verProducto, vistaUnicaProducto, users, division, suma, esPar, lista, metodoPost }
